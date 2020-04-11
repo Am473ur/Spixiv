@@ -8,5 +8,7 @@
         "https://www.pixiv.net/ranking.php?mode=male",
         "https://www.pixiv.net/ranking.php?mode=female"
     ],
-    "picture_saving_path":"data/img_mini"
+    "img_quality":"regular",
+    "img_save_path":"Spixiv"
 }]
+

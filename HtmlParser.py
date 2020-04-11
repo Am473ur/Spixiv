@@ -1,10 +1,16 @@
-import requests
 from bs4 import BeautifulSoup
-import os
-import time
 import re
-import random
+import json
 class htmlparser():
+    def __init__(self):
+        self.img_qulity=self.get_img_quality()
+    
+    def get_img_quality(self):
+        f = open("Settings.json", encoding='utf-8')
+        setting = json.load(f)
+        img_quality=setting[0]["img_quality"]
+        return img_quality
+
     def get_img_urls(self,page_url,html_text):# 从图片列表页面获取多个进入图片详情页面的 url
         urls=[]
         if page_url is None or html_text is None:
@@ -22,17 +28,6 @@ class htmlparser():
             return
         soup=BeautifulSoup(html_text, 'lxml')
         str_soup=str(soup)
-        pattern = re.compile('"regular":"(.*?)"',re.I)
+        pattern = re.compile('\"'+self.img_qulity+'\":"(.*?)"',re.I)
         img_url = re.findall(pattern,str_soup)[0]
         return img_url
-'''
-审查元素发现 Pixiv 对每一个图片给出了以下五种尺寸的图片:
-"urls":{
-    "mini":"https://i.pximg.net/c/48x48/custom-thumb/img/2020/04/05/00/37/23/80569169_p0_custom1200.jpg",
-    "thumb":"https://i.pximg.net/c/250x250_80_a2/custom-thumb/img/2020/04/05/00/37/23/80569169_p0_custom1200.jpg",
-    "small":"https://i.pximg.net/c/540x540_70/img-master/img/2020/04/05/00/37/23/80569169_p0_master1200.jpg",
-    "regular":"https://i.pximg.net/img-master/img/2020/04/05/00/37/23/80569169_p0_master1200.jpg",
-    "original":"https://i.pximg.net/img-original/img/2020/04/05/00/37/23/80569169_p0.jpg"
-}
-
-'''

@@ -1,9 +1,5 @@
 import requests
-from bs4 import BeautifulSoup
-import os
-import time
-import re
-import random
+
 session = requests.session()
 head = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0',

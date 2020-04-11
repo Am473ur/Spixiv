@@ -1,9 +1,5 @@
-from PIL import Image
-import requests
-import numpy
-import os
-import re
-import json
+import requests,os,json
+
 img_url="https://i.pximg.net/img-original/img/2020/04/05/23/08/58/80592880_p0.jpg"
 
 session = requests.session()
@@ -15,16 +11,9 @@ head = {
 
 class imgdownloader():
     def __init__(self):
-        f = open("Settings.json", encoding='utf-8')
-        setting = json.load(f)
-        path = setting[0]["picture_saving_path"]
+        path = "data/images"
         current_path=os.getcwd()
-        if os.path.exists(path):
-            self.path=os.path.join(current_path, path)
-        else:
-            print('创建一个名为 ' + path + ' 的文件夹')
-            os.makedirs(os.path.join(current_path, path))
-            self.path=os.path.join(current_path, path)
+        self.path=os.path.join(current_path, path)
         self.pic_name = 'data\\pic_name.json'
         f=open(self.pic_name,'w')
         json.dump([],f)
@@ -46,7 +35,6 @@ class imgdownloader():
             print('获取该图片失败')
             return None
         img_name=self.get_img_name(img_url)
-        #print(img_name)
         with open(self.path+'\\'+img_name, 'ab') as f:
             f.write(img)
         f1=open(self.pic_name,encoding="utf-8")

@@ -1,6 +1,7 @@
-import sys
+import sys,base64,os,json,shutil,time
 from PyQt5 import QtWidgets,QtGui,QtCore
 import ImgDownloader
+from img_b64 import img_b64
 StyleSheet = '''
 QWidget#main_widget{
     border-radius:30px;
@@ -26,6 +27,9 @@ QPushButton {
 }
 
 #next_img {
+    font-family: "Microsoft YaHei";
+    color: white;
+    font-size:30px;
     background-color: #85cbeb;
     border-radius: 5px; /*圆角*/
 }
@@ -37,6 +41,9 @@ QPushButton {
 }
 
 #save_img {
+    font-family: "Microsoft YaHei";
+    font-size:30px;
+    color: white;
     background-color: #eaaf6f;
     border-radius: 5px; /*圆角*/
 }
@@ -48,6 +55,7 @@ QPushButton {
 }
 
 #about{
+    font-family: "Microsoft YaHei";
     font-size:24px;
     color: #eacaa7;
 }
@@ -55,9 +63,20 @@ QPushButton {
     font-family: "Microsoft YaHei";
     color: #b555f8;
 }
-
+#delet_img {
+    font-family: "Microsoft YaHei";
+    color: white;
+    font-size:24px;
+    background-color: #cf4858;
+    border-radius: 5px; /*圆角*/
+}
+#delet_img:hover {
+    background-color: #cd6470;
+}
+#delet_img:pressed {
+    background-color: #cb858d;
+}
 '''
-
 class MainUI(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -79,7 +98,10 @@ class MainUI(QtWidgets.QMainWindow):
         
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
-        pixmap = QtGui.QPixmap("backguarnd_imgs/backguarnd_img.png")#背景图片
+        img_data = base64.b64decode(img_b64)
+        with open('data\\backguarnd.png', 'wb') as f:
+            f.write(img_data)
+        pixmap = QtGui.QPixmap("data\\backguarnd.png")#背景图片
         painter.drawPixmap(self.rect(), pixmap)
 
     def position_table(self):
@@ -93,8 +115,8 @@ class MainUI(QtWidgets.QMainWindow):
         self.right_layout = QtWidgets.QGridLayout()
         self.right_widget.setLayout(self.right_layout) # 设置右侧部件布局为网格
 
-        self.main_layout.addWidget(self.left_widget,0,0,9,85) # 左侧部件在第0行第0列，占10行9列
-        self.main_layout.addWidget(self.right_widget,0,85,9,15) # 右侧部件在第0行第9列，占10行1列
+        self.main_layout.addWidget(self.left_widget,0,0,9,85) # 左侧部件在第0行第0列，占9行85列
+        self.main_layout.addWidget(self.right_widget,0,85,9,15) # 右侧部件在第0行第85列，占9行15列
 
         self.stateView = QtWidgets.QPlainTextEdit(self,objectName="stateView")#文本框
         self.stateView.setReadOnly(True)#文本框只读
@@ -104,27 +126,33 @@ class MainUI(QtWidgets.QMainWindow):
 
         self.right_close.setFixedSize(36,36) # 设置关闭按钮的大小
 
-        self.next_img = QtWidgets.QPushButton(" ", self,objectName="next_img")
+        self.next_img = QtWidgets.QPushButton("Next", self,objectName="next_img") #next_img按钮
         self.next_img.setFixedSize(240,200)
         self.next_img.clicked.connect(self.click_next_img)
-        self.save_img = QtWidgets.QPushButton(" ", self,objectName="save_img")
+        self.save_img = QtWidgets.QPushButton("Save", self,objectName="save_img") #save_img按钮
         self.save_img.setFixedSize(240,60)
         self.save_img.clicked.connect(self.click_save_img)
+        #self.right_close = QtWidgets.QPushButton("清除缓存并退出", self,objectName="delet_img") #delet_img按钮
+        #self.save_img.setFixedSize(240,30)
+        #self.save_img.clicked.connect(self.click_save_img)
 
-        self.zhanwei = QtWidgets.QPushButton(" ", self,objectName="zhanwei")
-        self.zhanwei.setFixedSize(240,200)
+        self.delet_img = QtWidgets.QPushButton("清除缓存并退出", self,objectName="delet_img")
+        self.delet_img.setFixedSize(240,60)
+        self.delet_img.clicked.connect(self.click_delet_img)#先触发事件 清除缓存
+        self.delet_img.clicked.connect(QtCore.QCoreApplication.instance().quit)#再退出
 
         self.about = QtWidgets.QPushButton("CaoYi", self,objectName="about")
-        self.about.setFixedSize(80,50)
+        self.about.setFixedSize(240,60)
         #self.about.clicked.connect(self.about)
 
         #self.right_layout.addWidget(self.right_mini,0,94,1,2,QtCore.Qt.AlignTop)
         self.right_layout.addWidget(self.right_close,0,97,1,2,QtCore.Qt.AlignTop)#关闭
         self.right_layout.addWidget(self.stateView,1,85,3,15,QtCore.Qt.AlignTop)#只读文本框（状态）
         self.right_layout.addWidget(self.next_img,4,85,2,15,QtCore.Qt.AlignCenter)#下一张
-        self.right_layout.addWidget(self.save_img,6,85,2,15,QtCore.Qt.AlignCenter)#保存
-        self.right_layout.addWidget(self.zhanwei,8,85,1,15)#占位
+        self.right_layout.addWidget(self.save_img,6,85,1,15,QtCore.Qt.AlignCenter)#保存
+        self.right_layout.addWidget(self.delet_img,7,85,1,15,QtCore.Qt.AlignCenter)#delete_img
         self.right_layout.addWidget(self.about,8,85,1,15,QtCore.Qt.AlignCenter)#关于
+        #self.right_layout.addWidget(self.save_img,9,85,1,15,QtCore.Qt.AlignCenter)#delete_img
 
     def show_img_init(self):
         self.img_cnt=0
@@ -133,31 +161,56 @@ class MainUI(QtWidgets.QMainWindow):
         self.painter.setObjectName('painter')
         #self.painter.setGeometry(QtCore.QRect(1, 1, 800, 600))
         self.img_manager=ImgDownloader.img_manager()
-    def click_next_img(self):
+        self.local_img_url="None"
+    def click_delet_img(self):
+        shutil.rmtree("data\\images")
         
-        local_img_url=str(self.img_manager.get_local_img())
-        if local_img_url=="None":
-            self.send_state_msg("点的太快啦~")
+    def click_next_img(self):
+        if os.path.exists(self.local_img_url):
+            os.remove(self.local_img_url)#删除临时文件夹中的图片
+            #self.stateView.appendPlainText('删除成功')
+        else:
+            pass
+            #self.stateView.appendPlainText('删除{}失败'.format(self.local_img_url))
+
+        self.local_img_url=str(self.img_manager.get_local_img())# pop 出一个图片名
+        if self.local_img_url=="None":
+            self.send_state_msg("(＞﹏＜)点得太快啦~")
             return None
         else:
             self.img_cnt+=1
-            self.send_state_msg(local_img_url)
-            self.stateView.appendPlainText('现在是第{}张'.format(self.img_cnt))
-        local_img_url="data\\img_mini\\"+local_img_url
-        pixmap = QtGui.QPixmap(local_img_url)
-        self.painter.setPixmap(pixmap)
+            self.send_state_msg(self.local_img_url)
+            self.stateView.appendPlainText('这是第 {} 张'.format(self.img_cnt))
         
+        self.local_img_url="data\\images\\"+self.local_img_url # 把图片名拼成地址
+        pixmap = QtGui.QPixmap(self.local_img_url)
+        self.painter.setPixmap(pixmap)
         self.painter.setScaledContents(True)
         self.left_layout.addWidget(self.painter,0,0,9,85,QtCore.Qt.AlignCenter)
     def click_save_img(self):
-        self.stateView.appendPlainText('啦啦啦啦~')
+        #self.stateView.appendPlainText('当前图片是{}'.format(self.local_img_url))
+        img_save_path=self.get_img_save_path() #从 Setting.json 中获取图片保存路径
+        if not os.path.exists(img_save_path): #如果文件夹不存在，就创建一个
+            self.stateView.appendPlainText('创建 ' + img_save_path + ' 文件夹')
+            os.makedirs(img_save_path)
+        if self.local_img_url=="None":
+            self.stateView.appendPlainText('(/= _ =)/~┴┴ 找不到图片啊~')
+        else:
+            shutil.copy(self.local_img_url, img_save_path)
+            self.stateView.appendPlainText('嘿嘿嘿~保存成功！')
+    def get_img_save_path(self):
+        f = open("Settings.json", encoding='utf-8')
+        setting = json.load(f)
+        img_save_path=setting[0]["img_save_path"]
+        return img_save_path
 
     def send_state_msg(self,msg):
         self.stateView.appendPlainText(msg)
-
+'''
 def Start_UI():
     app = QtWidgets.QApplication(sys.argv)
     app.setStyleSheet(StyleSheet)
     ex = MainUI()
     sys.exit(app.exec_()) 
 #Start_UI()
+'''
