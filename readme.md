@@ -2,9 +2,9 @@
 
 A Pixiv spider tool with friendly user interface.
 
-您也可以到我的博客下载方便的可执行文件。http://caoyi.site/?p=126
+您也可以到我的博客下载方便的可执行文件。http://caoyi.site/?p=92
 
-![Spixiv](Spixiv.png)
+![Spixiv](http://caoyi.site/wp-content/uploads/2020/04/Spixiv.png)
 
 ## How to use
 
