@@ -2,9 +2,7 @@
 
 A Pixiv spider tool with friendly user interface.
 
-您也可以到我的博客下载方便的可执行文件。http://am473ur.com/?p=92
-
-![Spixiv](http://caoyi.site/wp-content/uploads/2020/04/Spixiv.png)
+![Spixiv](https://qiniu.am473ur.com/img/Spixiv.png)
 
 ## How to use
 
