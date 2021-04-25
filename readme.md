@@ -23,6 +23,4 @@ Tips：
 
 ## About
 
-Python 3.7.6 64bit
-
-PyQt5
+Python 3.7.6 + PyQt5
